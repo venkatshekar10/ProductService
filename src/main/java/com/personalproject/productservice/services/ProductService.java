@@ -13,5 +13,6 @@ public interface ProductService {
                           String imageUrl, String category);
     Product updateProduct(Long Id, String name, String description, double price,
                           String imageUrl);
+    List<Product> getAllProductsFromCategory(String name);
 
 }

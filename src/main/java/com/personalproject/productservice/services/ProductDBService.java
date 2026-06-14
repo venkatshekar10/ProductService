@@ -1,5 +1,6 @@
 package com.personalproject.productservice.services;
 
+import com.personalproject.productservice.exceptions.CategoryNotFoundException;
 import com.personalproject.productservice.exceptions.ProductNotFoundException;
 import com.personalproject.productservice.models.Category;
 import com.personalproject.productservice.models.Product;
@@ -10,8 +11,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
-import static ch.qos.logback.core.joran.spi.ConsoleTarget.findByName;
 
 @Service("ProductDBService")
 public class ProductDBService implements ProductService {
@@ -72,6 +71,23 @@ public class ProductDBService implements ProductService {
             product.setImageUrl(imageUrl);
         }
         return productRepository.save(product);
+    }
+
+    @Override
+    public List<Product> getAllProductsFromCategory(String name) {
+//        Optional<Category> optionalCategory = categoryRepository.findByName(name);
+//        if(optionalCategory.isEmpty()) {
+//            throw new CategoryNotFoundException("Category " +name+ " not found");
+//        }
+//        Category category = optionalCategory.get();
+//        QueryByMethod
+//        List<Product> products = productRepository.findByCategory(category);
+//        DerivedQuery
+//        List<Product> products = productRepository.findByCategory_Name(name);
+//        HQL
+//        List<Product> products = productRepository.findByCategoryName(name);
+//        Native Query
+        return productRepository.findByCategoryNameNative(name);
     }
 
     public Category validateCategoryExist(String name) {

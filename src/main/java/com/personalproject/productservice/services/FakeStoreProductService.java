@@ -71,4 +71,9 @@ public class FakeStoreProductService implements ProductService{
     public Product updateProduct(Long Id, String name, String description, double price, String imageUrl) {
         return null;
     }
+
+    @Override
+    public List<Product> getAllProductsFromCategory(String name) {
+        return List.of();
+    }
 }

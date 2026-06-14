@@ -25,4 +25,12 @@ public class GlobalExceptionHandler {
         error.setMessage(productNotFoundException.getMessage());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<ErrorDTO> CategoryNotFoundException(CategoryNotFoundException categoryNotFoundException) {
+        ErrorDTO error = new ErrorDTO();
+        error.setStatus("Failure");
+        error.setMessage(categoryNotFoundException.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
 }

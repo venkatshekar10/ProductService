@@ -61,4 +61,16 @@ public class ProductController {
                 createFakeStoreProductDTO.getImageUrl());
         return ProductResponseDTO.from(product);
     }
+
+    @GetMapping("/category")
+    public List<ProductResponseDTO> getAllProductsFromCategory(@RequestParam("categoryName") String name) {
+        List<Product> products = productService.getAllProductsFromCategory(name);
+        List<ProductResponseDTO> productResponseDTOS = new ArrayList<>();
+        for (Product product : products) {
+            ProductResponseDTO productResponseDTO = ProductResponseDTO.from(product);
+            productResponseDTOS.add(productResponseDTO);
+        }
+        return productResponseDTOS;
+    }
+
 }
