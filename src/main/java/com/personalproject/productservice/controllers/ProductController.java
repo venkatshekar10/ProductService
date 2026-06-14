@@ -4,6 +4,7 @@ import com.personalproject.productservice.dtos.CreateFakeStoreProductDTO;
 import com.personalproject.productservice.dtos.ProductResponseDTO;
 import com.personalproject.productservice.models.Product;
 import com.personalproject.productservice.services.ProductService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class ProductController {
 
     ProductService productService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(@Qualifier("ProductDBService") ProductService productService) {
         this.productService = productService;
     }
 
@@ -47,6 +48,17 @@ public class ProductController {
                 createFakeStoreProductDTO.getPrice(),
                 createFakeStoreProductDTO.getImageUrl(),
                 createFakeStoreProductDTO.getCategory());
+        return ProductResponseDTO.from(product);
+    }
+
+    @PutMapping("/updateProduct/{Id}")
+    public ProductResponseDTO updateProductPrice(@PathVariable Long Id, @RequestBody CreateFakeStoreProductDTO createFakeStoreProductDTO) {
+        Product product = productService.updateProduct(
+                Id,
+                createFakeStoreProductDTO.getName(),
+                createFakeStoreProductDTO.getDescription(),
+                createFakeStoreProductDTO.getPrice(),
+                createFakeStoreProductDTO.getImageUrl());
         return ProductResponseDTO.from(product);
     }
 }
