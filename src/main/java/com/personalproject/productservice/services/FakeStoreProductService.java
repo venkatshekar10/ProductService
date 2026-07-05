@@ -1,9 +1,11 @@
 package com.personalproject.productservice.services;
 
+import com.mysql.cj.x.protobuf.MysqlxExpr;
 import com.personalproject.productservice.dtos.FakeStoreProductDTO;
 import com.personalproject.productservice.dtos.FakeStoreProductRequestDTO;
 import com.personalproject.productservice.exceptions.ProductNotFoundException;
 import com.personalproject.productservice.models.Product;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -15,12 +17,23 @@ public class FakeStoreProductService implements ProductService{
 
     RestTemplate restTemplate;
 
-    public FakeStoreProductService(RestTemplate restTemplate) {
+    RedisTemplate<String, Object> redisTemplate;
+
+    public FakeStoreProductService(RestTemplate restTemplate,
+                                   RedisTemplate<String, Object> redisTemplate) {
         this.restTemplate = restTemplate;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
     public Product getProductById(Long Id) {
+
+        Product productFromCache = (Product) redisTemplate.opsForValue().get(String.valueOf(Id));
+
+        if(productFromCache != null) {
+            return productFromCache;
+        }
+
         FakeStoreProductDTO fakeStoreProductDTO =
                 restTemplate.getForObject("https://fakestoreapi.com/products/" + Id,
                         FakeStoreProductDTO.class);
@@ -29,7 +42,10 @@ public class FakeStoreProductService implements ProductService{
             throw new ProductNotFoundException("Product not found with id : " + Id);
         }
 
-        return fakeStoreProductDTO.toProduct(fakeStoreProductDTO);
+        Product productFromFakeStore = fakeStoreProductDTO.toProduct(fakeStoreProductDTO);
+
+        redisTemplate.opsForValue().set(String.valueOf(Id), productFromFakeStore);
+        return productFromFakeStore;
     }
 
     @Override
