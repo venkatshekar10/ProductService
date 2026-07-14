@@ -1,9 +1,11 @@
 package com.personalproject.productservice.controllers;
 
+import com.personalproject.productservice.commons.ApplicationCommons;
 import com.personalproject.productservice.dtos.CreateFakeStoreProductDTO;
 import com.personalproject.productservice.dtos.ProductResponseDTO;
 import com.personalproject.productservice.models.Product;
 import com.personalproject.productservice.services.ProductService;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +19,18 @@ import java.util.List;
 public class ProductController {
 
     ProductService productService;
+    ApplicationCommons applicationCommons;
 
-    public ProductController(@Qualifier("FakeStoreProductService") ProductService productService) {
+    public ProductController(@Qualifier("FakeStoreProductService") ProductService productService,
+                             ApplicationCommons applicationCommons) {
         this.productService = productService;
+        this.applicationCommons = applicationCommons;
     }
 
     @GetMapping("/{Id}")
-    public ResponseEntity<ProductResponseDTO> getProductById(@PathVariable Long Id) {
+    public ResponseEntity<ProductResponseDTO> getProductById(@PathVariable Long Id,
+                                                             @RequestHeader("Authorization") String token) {
+        applicationCommons.validateToken(token);
        Product product = productService.getProductById(Id);
        ProductResponseDTO productResponseDTO = ProductResponseDTO.from(product);
        return new ResponseEntity<>(productResponseDTO, HttpStatus.OK);

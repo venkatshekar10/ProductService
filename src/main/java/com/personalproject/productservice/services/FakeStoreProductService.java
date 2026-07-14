@@ -5,6 +5,7 @@ import com.personalproject.productservice.dtos.FakeStoreProductDTO;
 import com.personalproject.productservice.dtos.FakeStoreProductRequestDTO;
 import com.personalproject.productservice.exceptions.ProductNotFoundException;
 import com.personalproject.productservice.models.Product;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -19,7 +20,7 @@ public class FakeStoreProductService implements ProductService{
 
     RedisTemplate<String, Object> redisTemplate;
 
-    public FakeStoreProductService(RestTemplate restTemplate,
+    public FakeStoreProductService(@Qualifier("getRestTemplate") RestTemplate restTemplate,
                                    RedisTemplate<String, Object> redisTemplate) {
         this.restTemplate = restTemplate;
         this.redisTemplate = redisTemplate;
