@@ -1,5 +1,6 @@
 package com.personalproject.productservice.commons;
 
+import com.personalproject.productservice.dtos.TokenValidationResponseDTO;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -14,15 +15,15 @@ public class ApplicationCommons {
     }
 
     public void validateToken(String token) {
-        if(token.isEmpty() || token.isBlank()) {
+        if (token.isEmpty() || token.isBlank()) {
             throw new RuntimeException("Token Invalid : Empty Token");
         }
 
-        String url = "http://userService/api/user/validate/"+token;
+        String url = "http://userService/api/user/validate/" + token;
 
-        Boolean isValidToken = restTemplate.getForObject(url, Boolean.class);
+        TokenValidationResponseDTO response = restTemplate.getForObject(url, TokenValidationResponseDTO.class);
 
-        if(Boolean.FALSE.equals(isValidToken)) {
+        if (response == null || !response.isValid()) {
             throw new RuntimeException("Invalid Token: Token Expired");
         }
     }

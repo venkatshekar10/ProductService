@@ -4,8 +4,10 @@ import com.personalproject.productservice.exceptions.CategoryNotFoundException;
 import com.personalproject.productservice.exceptions.ProductNotFoundException;
 import com.personalproject.productservice.models.Category;
 import com.personalproject.productservice.models.Product;
+import com.personalproject.productservice.models.ProductDocument;
 import com.personalproject.productservice.repositories.CategoryRepository;
 import com.personalproject.productservice.repositories.ProductRepository;
+import com.personalproject.productservice.repositories.ProductSearchRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,10 +19,14 @@ public class ProductDBService implements ProductService {
 
     ProductRepository productRepository;
     CategoryRepository categoryRepository;
+    ProductSearchRepository productSearchRepository;
 
-    public ProductDBService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public ProductDBService(ProductRepository productRepository,
+                            CategoryRepository categoryRepository,
+                            ProductSearchRepository productSearchRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.productSearchRepository = productSearchRepository;
     }
 
     @Override
@@ -48,7 +54,19 @@ public class ProductDBService implements ProductService {
         product.setDescription(description);
         product.setImageUrl(imageUrl);
         product.setName(name);
-        return productRepository.save(product);
+        Product newProduct = productRepository.save(product);
+
+        //Index into ElasticSearch
+        ProductDocument doc = new ProductDocument();
+        doc.setId(String.valueOf(newProduct.getId()));
+        doc.setName(newProduct.getName());
+        doc.setDescription(newProduct.getDescription());
+        doc.setPrice(newProduct.getPrice());
+        doc.setCategory(newProduct.getCategory().getName());
+        productSearchRepository.save(doc);
+        //Index into ElasticSearch
+
+        return newProduct;
     }
 
     @Override
@@ -70,7 +88,19 @@ public class ProductDBService implements ProductService {
         if(!Objects.equals(imageUrl, product.getImageUrl()) && imageUrl != null) {
             product.setImageUrl(imageUrl);
         }
-        return productRepository.save(product);
+        Product updatedProduct = productRepository.save(product);
+
+        //Index into ElasticSearch
+        ProductDocument doc = new ProductDocument();
+        doc.setId(String.valueOf(updatedProduct.getId()));
+        doc.setName(updatedProduct.getName());
+        doc.setDescription(updatedProduct.getDescription());
+        doc.setPrice(updatedProduct.getPrice());
+        doc.setCategory(updatedProduct.getCategory().getName());
+        productSearchRepository.save(doc);
+        //Index into ElasticSearch
+
+        return updatedProduct;
     }
 
     @Override

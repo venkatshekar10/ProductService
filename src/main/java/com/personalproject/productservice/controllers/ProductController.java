@@ -4,6 +4,8 @@ import com.personalproject.productservice.commons.ApplicationCommons;
 import com.personalproject.productservice.dtos.CreateFakeStoreProductDTO;
 import com.personalproject.productservice.dtos.ProductResponseDTO;
 import com.personalproject.productservice.models.Product;
+import com.personalproject.productservice.models.ProductDocument;
+import com.personalproject.productservice.repositories.ProductSearchRepository;
 import com.personalproject.productservice.services.ProductService;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,11 +22,14 @@ public class ProductController {
 
     ProductService productService;
     ApplicationCommons applicationCommons;
+    ProductSearchRepository productSearchRepository;
 
-    public ProductController(@Qualifier("FakeStoreProductService") ProductService productService,
-                             ApplicationCommons applicationCommons) {
+    public ProductController(@Qualifier("ProductDBService") ProductService productService,
+                             ApplicationCommons applicationCommons,
+                             ProductSearchRepository productSearchRepository) {
         this.productService = productService;
         this.applicationCommons = applicationCommons;
+        this.productSearchRepository = productSearchRepository;
     }
 
     @GetMapping("/{Id}")
@@ -78,6 +83,13 @@ public class ProductController {
             productResponseDTOS.add(productResponseDTO);
         }
         return productResponseDTOS;
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductDocument>> searchProducts(@RequestParam String query) {
+        List<ProductDocument> results = productSearchRepository
+                .findByNameContainingOrDescriptionContaining(query, query);
+        return ResponseEntity.ok(results);
     }
 
 }
